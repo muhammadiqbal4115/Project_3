@@ -1,16 +1,3 @@
-"""
-Customer Churn Prediction - Streamlit App
-------------------------------------------
-- Auto-detects "Churn_Modelling.csv" in the working directory (or lets you upload it).
-- Trains the encoders / scaler / ANN model fully IN-MEMORY using
-  st.cache_resource, so nothing is written to disk (no .pkl / .h5 / .keras
-  files get saved in the folder). Everything lives in Streamlit's cache for
-  the lifetime of the session/app process.
-- If you already have model.h5 / model.keras / *.pkl files sitting next to
-  this script, the app will use those instead of retraining (still loaded
-  once and cached in memory, not re-saved).
-"""
-
 import os
 import pickle
 import numpy as np
@@ -20,6 +7,121 @@ import streamlit as st
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 st.set_page_config(page_title="Customer Churn Prediction", page_icon="📉", layout="centered")
+
+# --------------------------------------------------------------------------
+# Dark theme styling
+# --------------------------------------------------------------------------
+st.markdown(
+    """
+    <style>
+
+    .stApp {
+        background-color: #0F1117;
+        color: #E5E7EB;
+    }
+
+    .block-container {
+        padding-top: 1.5rem;
+    }
+
+    h1, h2, h3 {
+        color: #93C5FD;
+    }
+
+    p, span, label, div {
+        color: #E5E7EB;
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #131722;
+        border-right: 1px solid #262B3A;
+    }
+    [data-testid="stSidebar"] * {
+        color: #E5E7EB !important;
+    }
+
+    /* Buttons */
+    .stButton>button {
+        width: 100%;
+        background-color: #1E3A8A;
+        color: white;
+        border-radius: 10px;
+        height: 3em;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+    }
+
+    .stButton>button:hover {
+        background-color: #2C4CA8;
+        color: white;
+    }
+
+    /* Metric cards / containers */
+    .metric-card {
+        background-color: #1A1D27;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0px 2px 8px rgba(0,0,0,0.4);
+        border: 1px solid #2A2E3A;
+        color: #E5E7EB;
+    }
+
+    /* Built-in st.metric widget */
+    [data-testid="stMetric"] {
+        background-color: #1A1D27;
+        border: 1px solid #2A2E3A;
+        border-radius: 12px;
+        padding: 12px 16px;
+    }
+    [data-testid="stMetricLabel"], [data-testid="stMetricValue"] {
+        color: #E5E7EB !important;
+    }
+
+    /* Inputs */
+    .stNumberInput input, .stTextInput input, .stSelectbox > div > div {
+        background-color: #1A1D27 !important;
+        color: #E5E7EB !important;
+        border: 1px solid #2A2E3A !important;
+        border-radius: 8px !important;
+    }
+    .stSlider [data-baseweb="slider"] {
+        color: #93C5FD !important;
+    }
+
+    /* File uploader */
+    [data-testid="stFileUploaderDropzone"] {
+        background-color: #1A1D27 !important;
+        border: 1.5px dashed #2A2E3A !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stFileUploaderDropzone"] * {
+        color: #E5E7EB !important;
+    }
+
+    /* Divider */
+    hr {
+        border-color: #262B3A !important;
+    }
+
+    /* Success / Error / Info / Warning boxes */
+    .stSuccess, .stError, .stWarning, .stInfo {
+        border-radius: 10px !important;
+    }
+
+    /* Progress bar track */
+    .stProgress > div > div {
+        background-color: #262B3A !important;
+    }
+    .e1yxiy6j6{
+    display: none;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 CSV_NAME = "Churn_Modelling.csv"
 MODEL_CANDIDATES = ["model.h5", "model.keras"]
